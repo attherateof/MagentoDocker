@@ -1,0 +1,136 @@
+volumes:
+  valkey-cache:
+  valkey-session:
+  redis-insight:
+  rabbitmq-data:
+  jenkins-data:
+
+services:
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    ports:
+      - 5540:5540
+    volumes:
+      - type: volume
+        source: redis-insight
+        target: /db
+  
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    env_file:
+      - docker/env/opensearch-dashboard.env
+    networks:
+      - magento
+
+  valkey-cache:
+    build:
+      context: ./docker/images/valkey/cache
+    sysctls:
+      - net.core.somaxconn=65535
+    networks:
+      - magento
+    volumes:
+      - type: volume
+        source: valkey-cache
+        target: /data
+    ports:
+      - '8379:6379'
+
+  valkey-session:
+    build:
+      context: ./docker/images/valkey/session
+    sysctls:
+      - net.core.somaxconn=65535
+    networks:
+      - magento
+    volumes:
+      - type: volume
+        source: valkey-session
+        target: /data
+    ports:
+      - '7379:6379'
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      - magento
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    env_file:
+      - docker/env/rabbitmq.env
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 8080:80
+    networks:
+      - magento
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    networks:
+      - magento
+
+  mailpit:
+    image: axllent/mailpit:v1.23
+    container_name: mailpit
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP Server
+    restart: unless-stopped
+    networks:
+      - magento
+
+  # varnish:
+  #   image: varnish:7.6.0
+  #   container_name: varnish
+  #   volumes:
+  #     - "./docker/images/varnish/varnish.vcl:/etc/varnish/default.vcl"
+  #   ports:
+  #     - "8080:80"
+  #   tmpfs:
+  #     - /var/lib/varnish:exec
+  #   environment:
+  #     - VARNISH_SIZE=2G  
+  #   command: "-p default_keep=300"
+  #   depends_on:
+  #     - "nginx"
+  #   networks:
+  #     - magento
+
+  # before enable it, make sure you have package.json in root directory
+  # node:
+  #   build:
+  #     context: ./docker/images/node
+  #     args:
+  #       app_user_id: ${APP_USER_ID}
+  #       app_group_id: ${APP_GROUP_ID}
+  #   depends_on:
+  #     - php-fpm
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - magento
+  #   volumes:
+  #     - ./build:/var/www/html
+  #   environment:
+  #     - NODE_ENV=development
