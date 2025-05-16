@@ -2,7 +2,8 @@ volumes:
   mariadb:
   opensearch-data1:
   opensearch-data2:
-  ssl-certs: #volume for SSL, so multiple container can use it
+  ssl-certificate:
+  #volume for SSL, so multiple container can use it
 
 networks:
   magento:
@@ -10,6 +11,7 @@ networks:
 
 services:
   mariadb:
+    container_name: ${MARIADB_CONTAINER}
     image: mariadb:11.4.5
     networks:
       - magento
@@ -26,7 +28,24 @@ services:
         source: mariadb
         target: /var/lib/mysql
 
+  php-fpm:
+    container_name: ${PHP_FPM_CONTAINER}
+    build:
+      context: ./docker/images/php
+      args:
+        app_user_id: ${APP_USER_ID}
+        app_group_id: ${APP_GROUP_ID}
+    networks:
+      - magento
+    volumes:
+      - ./build:/var/www/html
+    ports:
+      - ${HOST_MACHINE_PHP_FPM_PORT}:${CONTAINER_PHP_FPM_PORT}
+    expose:
+      - ${CONTAINER_PHP_FPM_PORT}
+
   nginx:
+    container_name: ${NGINX_CONTAINER}
     build:
       context: ./docker/images/nginx
       args:
@@ -36,8 +55,11 @@ services:
       - php-fpm
       - mariadb
     ports:
-      - 80:80
-      - 443:443
+      - ${HOST_MACHINE_NGINX_HTTP_PORT}:${CONTAINER_NGINX_HTTP_PORT}
+      - ${HOST_MACHINE_NGINX_HTTPS_PORT}:${CONTAINER_NGINX_HTTPS_PORT}
+    expose:
+      - ${CONTAINER_NGINX_HTTP_PORT}
+      - ${CONTAINER_NGINX_HTTPS_PORT}
     networks:
       - magento
     volumes:
@@ -48,34 +70,18 @@ services:
         source: ./build
         target: /var/www/html
       - type: volume
-        source: ssl-certs
+        source: ssl-certificate
         target: /etc/nginx/certs
 
-  php-fpm:
-    build:
-      context: ./docker/images/php
-      args:
-        app_user_id: ${APP_USER_ID}
-        app_group_id: ${APP_GROUP_ID}
-        user_name: ${USER_NAME}
-        password: ${PASSWORD}
-        app_version: ${VERSION}
-    networks:
-      - magento
-    volumes:
-      - ./build:/var/www/html
-    ports:
-      - 9000:9000
-    
   opensearch-primary:
     image: opensearchproject/opensearch:2.19.1
-    container_name: opensearch-primary
+    container_name: ${PRIMARY_OPENSEARCH_CONTAINER}
     ulimits:
       memlock:
-        soft: -1 
+        soft: -1
         hard: -1
       nofile:
-        soft: 65536 
+        soft: 65536
         hard: 65536
     env_file:
       - docker/env/opensearch-primary.env
@@ -87,14 +93,14 @@ services:
         source: opensearch-data1
         target: /usr/share/opensearch/data
     ports:
-      - 9200:9200
-      - 9600:9600
+      - ${HOST_MACHINE_PRIMARY_OPENSEARCH_PORT}:${CONTAINER_PRIMARY_OPENSEARCH_PORT}
+      - ${HOST_MACHINE_SECONDARY_OPENSEARCH_PORT}:${CONTAINER_SECONDARY_OPENSEARCH_PORT}
     networks:
       - magento
 
   opensearch-secondary:
     image: opensearchproject/opensearch:2.19.1
-    container_name: opensearch-secondary
+    container_name: ${SECONDARY_OPENSEARCH_CONTAINER} 
     ulimits:
       memlock:
         soft: -1

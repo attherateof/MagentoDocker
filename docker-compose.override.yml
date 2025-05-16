@@ -1,33 +1,14 @@
 volumes:
   valkey-cache:
   valkey-session:
-  redis-insight:
   rabbitmq-data:
   jenkins-data:
+  redis-insight:
 
 services:
-  redisinsight:
-    image: redislabs/redisinsight:latest
-    ports:
-      - 5540:5540
-    volumes:
-      - type: volume
-        source: redis-insight
-        target: /db
-  
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
-    ports:
-      - 5601:5601
-    expose:
-      - "5601"
-    env_file:
-      - docker/env/opensearch-dashboard.env
-    networks:
-      - magento
 
   valkey-cache:
+    container_name: ${VALKEY_CACHE_CONTAINER}
     build:
       context: ./docker/images/valkey/cache
     sysctls:
@@ -39,9 +20,10 @@ services:
         source: valkey-cache
         target: /data
     ports:
-      - '8379:6379'
+      - ${HOST_MACHINE_VALKEY_CACHE_PORT}:${CONTAINER_VALKEY_CACHE_PORT}
 
   valkey-session:
+    container_name: ${VALKEY_SESION_CONTAINER}
     build:
       context: ./docker/images/valkey/session
     sysctls:
@@ -53,13 +35,14 @@ services:
         source: valkey-session
         target: /data
     ports:
-      - '7379:6379'
+      - ${HOST_MACHINE_VALKEY_SESSION_PORT}:${CONTAINER_VALKEY_SESSION_PORT}
 
   rabbitmq:
+    container_name: ${RABBIT_MQ_CONTAINER}
     image: rabbitmq:4-management
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - ${HOST_MACHINE_RABBIT_MQ_MESSAGING_PORT}:${CONTAINER_RABBIT_MQ_MESSAGING_PORT}
+      - ${HOST_MACHINE_RABBIT_MQ_WEB_UI_PORT}:${CONTAINER_RABBIT_MQ_WEB_UI_PORT}
     networks:
       - magento
     volumes:
@@ -67,24 +50,66 @@ services:
     env_file:
       - docker/env/rabbitmq.env
 
+  redisinsight:
+    container_name: ${REDIS_INSIGHT_CONTAINER}
+    image: redislabs/redisinsight:latest
+    ports:
+      - ${HOST_MACHINE_REDIS_INSIGHT_PORT}:${CONTAINER_REDIS_INSIGHT_PORT}
+    volumes:
+      - type: volume
+        source: redis-insight
+        target: /db
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: ${OPENSEARCH_DASHBOARD_CONTAINER}
+    ports:
+      - ${HOST_MACHINE_OPENSEARCH_DASHBOARD_PORT}:${CONTAINER_OPENSEARCH_DASHBOARD_PORT}
+    expose:
+      - ${CONTAINER_OPENSEARCH_DASHBOARD_PORT}
+    env_file:
+      - docker/env/opensearch-dashboard.env
+    networks:
+      - magento
+
+  logstash:
+    container_name: ${LOGSTASH_CONTAINER}
+    build:
+      context: ./docker/images/logstash
+    volumes:
+      - ./docker/images/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./docker/images/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./docker/images/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml # Mount the pipelines.yml file
+      - ./build/var/log:/var/www/html/var/log:ro
+    depends_on:
+      - opensearch-primary
+    networks:
+      - magento
+    environment:
+      - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
+      - LS_OPENSEARCH_HOST=${PRIMARY_OPENSEARCH_CONTAINER}
+      - LS_OPENSEARCH_PORT=${HOST_MACHINE_PRIMARY_OPENSEARCH_PORT}
+
   phpmyadmin:
+    container_name: ${PHP_MY_ADMIN_CONTAINER}
     image: phpmyadmin/phpmyadmin:latest
     depends_on:
       - mariadb
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: ${MARIADB_CONTAINER}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - 8080:80
+      - ${HOST_MACHINE_PHP_MY_ADMIN_WEB_UI_PORT}:${CONTAINER_PHP_MY_ADMIN_WEB_UI_PORT}
     networks:
       - magento
 
   jenkins:
+    container_name: ${JENKINS_CONTAINER}
     image: jenkins/jenkins:lts
     user: root
     ports:
-      - "8081:8080"
-      - "50000:50000"
+      - ${HOST_MACHINE_JENKINS_WEB_UI_PORT}:${CONTAINER_JENKINS_WEB_UI_PORT}
+      - ${HOST_MACHINE_JENKINS_AGENT_PORT}:${CONTAINER_JENKINS_AGENT_PORT}
     volumes:
       - jenkins-data:/var/jenkins_home
     networks:
@@ -92,45 +117,26 @@ services:
 
   mailpit:
     image: axllent/mailpit:v1.23
-    container_name: mailpit
+    container_name: ${MAILPIT_CONTAINER}
     ports:
-      - "8025:8025"  # Web UI
-      - "1025:1025"  # SMTP Server
+      - ${HOST_MACHINE_MAILPIT_WEB_UI_PORT}:${CONTAINER_MAILPIT_WEB_UI_PORT}
+      - ${HOST_MACHINE_MAILPIT_SMTP_PORT}:${CONTAINER_MAILPIT_SMTP_PORT}
     restart: unless-stopped
     networks:
       - magento
 
-  # varnish:
-  #   image: varnish:7.6.0
-  #   container_name: varnish
-  #   volumes:
-  #     - "./docker/images/varnish/varnish.vcl:/etc/varnish/default.vcl"
-  #   ports:
-  #     - "8080:80"
-  #   tmpfs:
-  #     - /var/lib/varnish:exec
-  #   environment:
-  #     - VARNISH_SIZE=2G  
-  #   command: "-p default_keep=300"
-  #   depends_on:
-  #     - "nginx"
-  #   networks:
-  #     - magento
-
-  # before enable it, make sure you have package.json in root directory
-  # node:
-  #   build:
-  #     context: ./docker/images/node
-  #     args:
-  #       app_user_id: ${APP_USER_ID}
-  #       app_group_id: ${APP_GROUP_ID}
-  #   depends_on:
-  #     - php-fpm
-  #   ports:
-  #     - 3000:3000
-  #   networks:
-  #     - magento
-  #   volumes:
-  #     - ./build:/var/www/html
-  #   environment:
-  #     - NODE_ENV=development
+  swoole-server:
+    container_name: ${SWOOLE_SERVER_CONTAINER}
+    build:
+      context: ./docker/images/php
+      args:
+        app_user_id: ${APP_USER_ID}
+        app_group_id: ${APP_GROUP_ID}
+    networks:
+      - magento
+    volumes:
+      - ./build:/var/www/html
+    ports:
+      - ${HOST_MACHINE_SWOOLE_SERVER_PORT}:${CONTAINER_SWOOLE_SERVER_PORT}
+    expose:
+      - ${CONTAINER_SWOOLE_SERVER_PORT}

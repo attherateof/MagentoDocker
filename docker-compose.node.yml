@@ -1,0 +1,21 @@
+services:
+
+  # before enable it, make sure you have package.json in root directory
+  node:
+    build:
+      context: ./docker/images/node
+      args:
+        app_user_id: ${APP_USER_ID}
+        app_group_id: ${APP_GROUP_ID}
+    depends_on:
+      - php-fpm
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    networks:
+      - magento
+    volumes:
+      - ./build:/var/www/html
+    environment:
+      - NODE_ENV=development

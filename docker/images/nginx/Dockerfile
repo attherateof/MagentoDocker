@@ -19,13 +19,10 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -subj "/CN=localhost"
 
 # Set permissions
-RUN chown -R app:app /etc/nginx/certs /var/cache/nginx/ /var/run/nginx.pid /sock /var/log/nginx
+RUN chown -R app:app /etc/nginx/certs/* /var/cache/nginx/ /var/run/nginx.pid /sock /var/log/nginx
 
 # Copy Nginx configuration
 COPY ./conf/default.conf /etc/nginx/conf.d/
-
-# Expose HTTP and HTTPS ports
-EXPOSE 80 443
 
 # Use non-root user after setup
 USER app:app

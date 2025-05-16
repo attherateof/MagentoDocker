@@ -25,7 +25,9 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libpcre3-dev \
     unzip \
-    && rm -rf /var/lib/apt/lists/*  # Clean up after installation to reduce image size
+    git \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Configure the GD library
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
@@ -53,18 +55,23 @@ RUN docker-php-ext-install \
     sodium \
     xmlwriter
 
+# Install Swoole extension
+RUN pecl install swoole && \
+    docker-php-ext-enable swoole && \
+    echo "swoole.use_shortname=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-swoole.ini
+
 RUN docker-php-ext-enable \
-    dom \ 
-    gd \ 
-    intl \ 
-    mbstring \ 
-    pdo_mysql \ 
-    xsl \ 
-    zip \ 
+    dom \
+    gd \
+    intl \
+    mbstring \
+    pdo_mysql \
+    xsl \
+    zip \
     ftp \
-    soap \ 
-    bcmath \ 
-    pcntl \ 
+    soap \
+    bcmath \
+    pcntl \
     sockets \
     opcache \
     ctype \
@@ -90,5 +97,3 @@ USER app:app
 
 VOLUME /var/www
 WORKDIR /var/www/html
-
-EXPOSE 9000

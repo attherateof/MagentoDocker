@@ -6,6 +6,6 @@
     <title>Hello</title>
 </head>
 <body>
-    <h1>Congratulations! Now you can start install Magento</h1>
+    <h1>Congratulations! Now you can start installing Magento</h1>
 </body>
 </html>

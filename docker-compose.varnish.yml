@@ -1,0 +1,18 @@
+services:
+
+  varnish:
+    image: varnish:7.6.0
+    container_name: varnish
+    volumes:
+      - "./docker/images/varnish/varnish.vcl:/etc/varnish/default.vcl"
+    ports:
+      - "8080:80"
+    tmpfs:
+      - /var/lib/varnish:exec
+    environment:
+      - VARNISH_SIZE=2G
+    command: "-p default_keep=300"
+    depends_on:
+      - "nginx"
+    networks:
+      - magento

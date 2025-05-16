@@ -1,2 +1,5 @@
-build/*
+build
 .env
+docker/images/nginx/log/*
+!docker/images/nginx/log/.gitkeep
+docker/images/logstash/pipeline/magento.conf

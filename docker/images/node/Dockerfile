@@ -21,8 +21,5 @@ RUN chown -R app:app /var/www
 # Use non-root user
 USER app:app
 
-# Expose the port the app runs on
-EXPOSE 3000
-
 # Use the entrypoint script
 CMD ["tail", "-f", "/dev/null"]
