@@ -31,6 +31,8 @@ Dockerisation of magento open source
 - Move to the root project directory in terminal
 - Run `cp .env.sample .env`
 - Run `cp build.sample .build`
+- Run `id` to know your current user id and group id
+- Once you get, update them in .env file respectively `APP_USER_ID` and `APP_GROUP_ID`
 - Run `docker compose build`
 - Run `docker compose up` or `docker compose up -d`
 - Check in Browser
