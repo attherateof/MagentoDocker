@@ -2,8 +2,11 @@
 Dockerisation of magento open source
 
 ## Prerequisite
-- Docker desktop applipation in your system
+- Docker applipation in your system
 - For windows user - WSL2
+
+## Magento version
+- Magento 2.4.8
 
 ## Environment used
 - MariaDB
@@ -18,7 +21,7 @@ Dockerisation of magento open source
 - Mailpit
 - Node (Enable after installing magento)
 - Logstash
-- PHPMyAdmin
+- PHP MyAdmin
 - Jenkins
 - Swoole
 
