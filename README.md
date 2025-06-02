@@ -45,11 +45,16 @@ Dockerisation of magento open source
 - Once done, re-start docker container (Otherwise nginx.conf will not get updated)
 
 ## Improvements
-- Xdebug Support
 - PHP Swoole plugin Support 
 
 ## Logstash
 If you are willing to use logstash, rename `docker/images/logstash/pipeline/magento.conf.sample` to `docker/images/logstash/pipeline/magento.conf`
 - Recomended to use https://github.com/attherateof/LogstashWrapper for easy setup
 
-
+## Xdebug
+- Xdebug is listning on 9003, if you want to change, change it in php.ini
+- Tested in VS code
+- Install PHP Debug by xdebug.org in VS Code
+- Select xdebug icon from left panel
+- Select "Listen for Xdebug" from drop down
+- Click on green triangle icon to start listening
