@@ -4,7 +4,7 @@ docker/images/nginx/log/*
 !docker/images/nginx/log/.gitkeep
 docker/images/logstash/pipeline/magento.conf
 docker/images/nginx/conf/default.conf
-!logs/nginx/.gitkeep
-!logs/php/.gitkeep
 logs/nginx/*
+!logs/nginx/.gitkeep
 logs/php/*
+!logs/php/.gitkeep
