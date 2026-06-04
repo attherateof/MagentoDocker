@@ -72,24 +72,6 @@ services:
     networks:
       - magento
 
-  logstash:
-    container_name: ${LOGSTASH_CONTAINER}
-    build:
-      context: ./docker/images/logstash
-    volumes:
-      - ./docker/images/logstash/pipeline:/usr/share/logstash/pipeline
-      - ./docker/images/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./docker/images/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml # Mount the pipelines.yml file
-      - ./build/var/log:/var/www/html/var/log:ro
-    depends_on:
-      - opensearch-primary
-    networks:
-      - magento
-    environment:
-      - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
-      - LS_OPENSEARCH_HOST=${PRIMARY_OPENSEARCH_CONTAINER}
-      - LS_OPENSEARCH_PORT=${HOST_MACHINE_PRIMARY_OPENSEARCH_PORT}
-
   phpmyadmin:
     container_name: ${PHP_MY_ADMIN_CONTAINER}
     image: phpmyadmin/phpmyadmin:latest
@@ -100,28 +82,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - ${HOST_MACHINE_PHP_MY_ADMIN_WEB_UI_PORT}:${CONTAINER_PHP_MY_ADMIN_WEB_UI_PORT}
-    networks:
-      - magento
-
-  jenkins:
-    container_name: ${JENKINS_CONTAINER}
-    image: jenkins/jenkins:lts
-    user: root
-    ports:
-      - ${HOST_MACHINE_JENKINS_WEB_UI_PORT}:${CONTAINER_JENKINS_WEB_UI_PORT}
-      - ${HOST_MACHINE_JENKINS_AGENT_PORT}:${CONTAINER_JENKINS_AGENT_PORT}
-    volumes:
-      - jenkins-data:/var/jenkins_home
-    networks:
-      - magento
-
-  mailpit:
-    image: axllent/mailpit:v1.23
-    container_name: ${MAILPIT_CONTAINER}
-    ports:
-      - ${HOST_MACHINE_MAILPIT_WEB_UI_PORT}:${CONTAINER_MAILPIT_WEB_UI_PORT}
-      - ${HOST_MACHINE_MAILPIT_SMTP_PORT}:${CONTAINER_MAILPIT_SMTP_PORT}
-    restart: unless-stopped
     networks:
       - magento
 

@@ -1,0 +1,14 @@
+services:
+
+  # before enable it, make sure you have magento installed and running
+  jenkins:
+    container_name: ${JENKINS_CONTAINER}
+    image: jenkins/jenkins:lts
+    user: root
+    ports:
+      - ${HOST_MACHINE_JENKINS_WEB_UI_PORT}:${CONTAINER_JENKINS_WEB_UI_PORT}
+      - ${HOST_MACHINE_JENKINS_AGENT_PORT}:${CONTAINER_JENKINS_AGENT_PORT}
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    networks:
+      - magento

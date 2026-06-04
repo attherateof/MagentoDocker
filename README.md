@@ -13,36 +13,27 @@ Dockerisation of magento open source
 - Nginx
 - PHP fpm
 - OpenSearch
-- Opensearch dashboard
-- Valkey
-- Redis Insight
-- RabbitMq
-- Varnish (Enable after installing magento)
-- Mailpit
-- Node (Enable after installing magento)
-- Logstash
-- PHP MyAdmin
-- Jenkins
 - Swoole
+- Valkey
+- RabbitMq
+- Opensearch dashboard
+- Redis Insight
+- PHP MyAdmin
+- Mailpit (Enable after installing magento)
+- Node (Enable after installing magento)
+- Logstash (Enable after installing magento)
+- Varnish (Enable after installing magento)
+- Jenkins (Enable after installing magento)
 
 ## Setup docker
 - Create a directory where you want to run this docker
 - Clone this Repository into the directory
 - Move to the root project directory in terminal
 - Run `cp .env.sample .env`
-- Run `cp build.sample .build`
-- Run `id` to know your current user id and group id
+- Run `id` in your terminal to know your current user id and group id
 - Once you get, update them in .env file respectively `APP_USER_ID` and `APP_GROUP_ID`
-- Run `docker compose build`
-- Run `docker compose up` or `docker compose up -d`
+- Run `./bin/php/install-magento.sh` or `./bin/php/install-magento.sh --sample-data` optionally if you want to install sample data
 - Check in Browser
-
-## Install Magento 
-- Make sure docker is up and running
-- Move inside php-fpm container
-- Remove all exisiting files and make it empty
-- Now, install Magento in a usual way
-- Once done, re-start docker container (Otherwise nginx.conf will not get updated)
 
 ## Improvements
 - PHP Swoole plugin Support 

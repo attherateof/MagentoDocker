@@ -1,0 +1,34 @@
+upstream fastcgi_backend {
+   server  php-fpm:9000;
+}
+
+# HTTP server
+server {
+   listen 80;
+   server_name localhost;
+
+   set $MAGE_ROOT /var/www/html;
+   set $MAGE_DEBUG_SHOW_ARGS 0;
+
+   access_log /var/log/nginx/access.log;
+   error_log /var/log/nginx/error.log;
+
+   include /var/www/html/nginx.conf.sample;
+}
+
+# HTTPS server
+server {
+   listen 443 ssl;
+   server_name localhost;
+
+   set $MAGE_ROOT /var/www/html;
+   set $MAGE_DEBUG_SHOW_ARGS 0;
+
+   ssl_certificate /etc/nginx/certs/nginx.crt;
+   ssl_certificate_key /etc/nginx/certs/nginx.key;
+
+   access_log /var/log/nginx/access.log;
+   error_log /var/log/nginx/error.log;
+
+   include /var/www/html/nginx.conf.sample;
+}

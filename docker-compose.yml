@@ -39,6 +39,7 @@ services:
       - magento
     volumes:
       - ./build:/var/www/html
+      - ./logs/php/xdebug:/var/log/xdebug
     ports:
       - ${HOST_MACHINE_PHP_FPM_PORT}:${CONTAINER_PHP_FPM_PORT}
     expose:
@@ -64,7 +65,7 @@ services:
       - magento
     volumes:
       - type: bind
-        source: ./docker/images/nginx/log
+        source: ./logs/nginx
         target: /var/log/nginx
       - type: bind
         source: ./build

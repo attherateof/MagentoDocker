@@ -1,0 +1,20 @@
+services:
+
+  # before enable it, make sure you have magento installed and running
+  logstash:
+    container_name: ${LOGSTASH_CONTAINER}
+    build:
+      context: ./docker/images/logstash
+    volumes:
+      - ./docker/images/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./docker/images/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./docker/images/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml # Mount the pipelines.yml file
+      - ./build/var/log:/var/www/html/var/log:ro
+    depends_on:
+      - opensearch-primary
+    networks:
+      - magento
+    environment:
+      - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
+      - LS_OPENSEARCH_HOST=${PRIMARY_OPENSEARCH_CONTAINER}
+      - LS_OPENSEARCH_PORT=${HOST_MACHINE_PRIMARY_OPENSEARCH_PORT}
