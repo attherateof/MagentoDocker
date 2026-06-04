@@ -11,6 +11,6 @@ docker_compose build
 docker_compose up -d
 
 info "Waiting for containers..."
-sleep 60
+sleep 45
 
 ok "Containers started"

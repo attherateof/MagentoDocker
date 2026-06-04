@@ -3,7 +3,9 @@ build
 docker/images/nginx/log/*
 !docker/images/nginx/log/.gitkeep
 docker/images/logstash/pipeline/magento.conf
-docker/images/nginx/conf/default.conf
+docker/images/nginx/conf/
+!docker/images/nginx/conf/generic.conf.sample
+!docker/images/nginx/conf/magento.conf.sample
 logs/nginx/*
 !logs/nginx/.gitkeep
 logs/php/*
