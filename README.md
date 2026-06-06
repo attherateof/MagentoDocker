@@ -7,6 +7,7 @@ Dockerisation of magento open source
 
 ## Magento version
 - Magento 2.4.8
+    ![Magento](source/magento.png)
 
 ## Environment used
 - MariaDB
@@ -16,14 +17,20 @@ Dockerisation of magento open source
 - Swoole
 - Valkey
 - RabbitMq
+    ![RabbitMQ](source/rabbit-mq.png)
 - Opensearch dashboard
+    ![Opensearch Dashboard](source/opensearch-dashboard.png)
 - Redis Insight
+    ![Redis Insight](source/redis-insight.png)
 - PHP MyAdmin
+    ![PHP My Admin](source/php-my-admin.png)
 - Varnish
 - Mailpit
+    ![Mailpit](source/mailpit.png)
 - Node
 - Logstash
 - Jenkins
+    ![Jenkins](source/jenkins.png)
 
 ## Setup docker
 - Create a directory where you want to run this docker
