@@ -49,3 +49,11 @@ If you are willing to use logstash, rename `docker/images/logstash/pipeline/mage
 - Select xdebug icon from left panel
 - Select "Listen for Xdebug" from drop down
 - Click on green triangle icon to start listening
+
+## Redis insight
+- To connect Valkey session DB, use `redis://host.docker.internal:7379` (if you are using WSL 2)
+- To connect Valkey cache DB, use `redis://host.docker.internal:8379` (if you are using WSL 2)
+
+## Jenkins
+- If you are willing to learn CI/CD pipeline, setup jenkins
+- use `docker exec -it jenkins_container cat /var/jenkins_home/secrets/initialAdminPassword` to get inital admin password
