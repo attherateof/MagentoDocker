@@ -48,7 +48,6 @@ echo "[INFO] Varnish VCL is present"
 "$SCRIPT_DIR/scripts/02-validate-env.sh"
 "$SCRIPT_DIR/scripts/03-prepare-build.sh"
 "$SCRIPT_DIR/scripts/04-set-nginx-config.sh"
-
 "$SCRIPT_DIR/scripts/05-docker-build.sh"
 "$SCRIPT_DIR/scripts/06-docker-up.sh"
 
@@ -56,7 +55,6 @@ echo "[SUCCESS] Containers started"
 
 "$SCRIPT_DIR/scripts/07-preflight-checks.sh"
 "$SCRIPT_DIR/scripts/08-configure-composer.sh"
-
 "$SCRIPT_DIR/scripts/09-install-magento.sh"
 
 if [[ "$INSTALL_SAMPLE_DATA" == "true" ]]; then
