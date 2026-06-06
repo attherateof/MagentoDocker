@@ -7,10 +7,10 @@ PROJECT_ROOT="$(cd "$PHP_BIN_DIR/../.." && pwd)"
 
 source "$SCRIPT_DIR/common.sh"
 
-docker_compose build
-docker_compose up -d
+info "Rebuilding and restarting Nginx and Varnish"
 
-info "Waiting for containers..."
-sleep 45
+docker_compose_full build nginx varnish
 
-ok "Containers started"
+docker_compose_full up -d nginx varnish
+
+ok "Nginx and Varnish rebuilt and restarted"

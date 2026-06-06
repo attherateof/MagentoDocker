@@ -61,14 +61,16 @@ RUN pecl install swoole && \
 # Install Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
-# Create app user and group
-RUN groupadd -g ${app_group_id} app && \
-    useradd -g ${app_group_id} -u ${app_user_id} -d /var/www -s /bin/bash app
+# Create app user and group (be tolerant if UID/GID already exist)
+RUN set -eux; \
+    groupadd -g ${app_group_id} app 2>/dev/null || true; \
+    useradd -g ${app_group_id} -u ${app_user_id} -d /var/www -s /bin/bash app 2>/dev/null || true
 
 # Ensure correct permissions
-RUN chown -R app:app /var/www
+RUN chown -R ${app_user_id}:${app_group_id} /var/www || true
 
-USER app:app
+# Use numeric UID:GID so container can switch even if username wasn't created
+USER ${app_user_id}:${app_group_id}
 
 VOLUME /var/www
 WORKDIR /var/www/html

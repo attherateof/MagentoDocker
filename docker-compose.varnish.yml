@@ -1,15 +1,17 @@
 services:
 
   varnish:
-    image: varnish:7.6.0
-    container_name: varnish
+    build:
+      context: ./docker/images/varnish
+    container_name: ${VARNISH_CONTAINER}
     volumes:
       - "./docker/images/varnish/varnish.vcl:/etc/varnish/default.vcl"
     ports:
-      - "8080:80"
+      - "${HOST_MACHINE_VARNISH_PORT}:${CONTAINER_VARNISH_PORT}"
     tmpfs:
-      - /var/lib/varnish:exec
+      - /var/lib/varnish:uid=${APP_USER_ID},gid=${APP_GROUP_ID},mode=0755,exec
     environment:
+      - VARNISH_HTTP_PORT=${CONTAINER_VARNISH_PORT}
       - VARNISH_SIZE=2G
     command: "-p default_keep=300"
     depends_on:

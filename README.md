@@ -19,11 +19,11 @@ Dockerisation of magento open source
 - Opensearch dashboard
 - Redis Insight
 - PHP MyAdmin
-- Mailpit (Enable after installing magento)
-- Node (Enable after installing magento)
-- Logstash (Enable after installing magento)
-- Varnish (Enable after installing magento)
-- Jenkins (Enable after installing magento)
+- Varnish
+- Mailpit
+- Node
+- Logstash
+- Jenkins
 
 ## Setup docker
 - Create a directory where you want to run this docker
@@ -32,7 +32,7 @@ Dockerisation of magento open source
 - Run `cp .env.sample .env`
 - Run `id` in your terminal to know your current user id and group id
 - Once you get, update them in .env file respectively `APP_USER_ID` and `APP_GROUP_ID`
-- Run `./bin/php/install-magento.sh` or `./bin/php/install-magento.sh --sample-data` optionally if you want to install sample data
+- Run `./bin/php/full-magento-installation.sh` or `./bin/php/full-magento-installation.sh --sample-data` optionally if you want to install sample data
 - Check in Browser
 
 ## Improvements

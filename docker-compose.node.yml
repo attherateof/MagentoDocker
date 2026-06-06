@@ -2,6 +2,7 @@ services:
 
   # before enable it, make sure you have package.json in root directory
   node:
+    container_name: ${NODE_CONTAINER}
     build:
       context: ./docker/images/node
       args:
@@ -10,9 +11,9 @@ services:
     depends_on:
       - php-fpm
     ports:
-      - 3000:3000
+      - "${HOST_MACHINE_NODE_PORT}:${CONTAINER_NODE_PORT}"
     expose:
-      - 3000
+      - ${CONTAINER_NODE_PORT}
     networks:
       - magento
     volumes:

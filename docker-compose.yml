@@ -95,7 +95,6 @@ services:
         target: /usr/share/opensearch/data
     ports:
       - ${HOST_MACHINE_PRIMARY_OPENSEARCH_PORT}:${CONTAINER_PRIMARY_OPENSEARCH_PORT}
-      - ${HOST_MACHINE_SECONDARY_OPENSEARCH_PORT}:${CONTAINER_SECONDARY_OPENSEARCH_PORT}
     networks:
       - magento
 
@@ -118,5 +117,7 @@ services:
       - type: volume
         source: opensearch-data2
         target: /usr/share/opensearch/data
+    ports:
+      - ${HOST_MACHINE_SECONDARY_OPENSEARCH_PORT}:${CONTAINER_SECONDARY_OPENSEARCH_PORT}
     networks:
       - magento

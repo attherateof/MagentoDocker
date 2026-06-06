@@ -1,6 +1,4 @@
 services:
-
-  # before enable it, make sure you have magento installed and running
   logstash:
     container_name: ${LOGSTASH_CONTAINER}
     build:
@@ -17,4 +15,4 @@ services:
     environment:
       - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
       - LS_OPENSEARCH_HOST=${PRIMARY_OPENSEARCH_CONTAINER}
-      - LS_OPENSEARCH_PORT=${HOST_MACHINE_PRIMARY_OPENSEARCH_PORT}
+      - LS_OPENSEARCH_PORT=${CONTAINER_PRIMARY_OPENSEARCH_PORT}

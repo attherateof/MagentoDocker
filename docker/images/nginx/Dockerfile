@@ -3,8 +3,10 @@ FROM nginx:1.26
 ARG app_user_id
 ARG app_group_id
 
-# Create user and group for app
-RUN groupadd -g ${app_group_id} app && useradd -g ${app_group_id} -u ${app_user_id} -d /var/www -s /bin/bash app
+# Create user and group for app (be tolerant if UID/GID already exist)
+RUN set -eux; \
+    groupadd -g ${app_group_id} app 2>/dev/null || true; \
+    useradd -g ${app_group_id} -u ${app_user_id} -d /var/www -s /bin/bash app 2>/dev/null || true
 
 # Create necessary directories
 RUN mkdir -p /var/www/html /sock /etc/nginx/certs /var/log/nginx && touch /var/run/nginx.pid
@@ -19,13 +21,13 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -subj "/CN=localhost"
 
 # Set permissions
-RUN chown -R app:app /etc/nginx/certs/* /var/cache/nginx/ /var/run/nginx.pid /sock /var/log/nginx
+RUN chown -R ${app_user_id}:${app_group_id} /etc/nginx/certs/* /var/cache/nginx/ /var/run/nginx.pid /sock /var/log/nginx || true
 
 # Copy Nginx configuration
 COPY ./conf/default.conf /etc/nginx/conf.d/
 
-# Use non-root user after setup
-USER app:app
+# Use non-root user after setup (numeric ids in case username wasn't created)
+USER ${app_user_id}:${app_group_id}
 
 VOLUME /var/www
 WORKDIR /var/www/html

@@ -18,11 +18,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 ENV_FILE="${PROJECT_ROOT}/.env"
+[[ -f "$ENV_FILE" ]] || fail ".env file not found: $ENV_FILE"
 
-if [ -f "$ENV_FILE" ]; then
-    # shellcheck disable=SC1091
-    source "$ENV_FILE"
-fi
+PHP_FPM_CONTAINER="$(cat "$ENV_FILE" | grep -E '^[[:space:]]*PHP_FPM_CONTAINER=' | tail -n1 | cut -d= -f2-)"
+PHP_FPM_CONTAINER="${PHP_FPM_CONTAINER#${PHP_FPM_CONTAINER%%[![:space:]]*}}"
+PHP_FPM_CONTAINER="${PHP_FPM_CONTAINER%${PHP_FPM_CONTAINER##*[![:space:]]}}"
+PHP_FPM_CONTAINER="${PHP_FPM_CONTAINER//\"/}"
+PHP_FPM_CONTAINER="${PHP_FPM_CONTAINER//\'/}"
 
 if [ -z "${PHP_FPM_CONTAINER:-}" ]; then
     fail "PHP_FPM_CONTAINER is not set in ${ENV_FILE}"
